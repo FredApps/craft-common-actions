@@ -352,9 +352,12 @@ The quality gate for an app's pull requests and pushes to main. It runs `command
 - prebuilt cargo tools from `tools` (by default `cargo-nextest@0.9.150`);
 - `CARGO_PROFILE_DEV_DEBUG=line-tables-only` (set `dev-debug: ""` to keep the repository's
   profile) and the caller's `env`, `linux-env` and `windows-env` lines, each `KEY=VALUE`;
-- a rust-cache dependency cache that only the default branch saves, so pull requests restore
-  main's entry and never evict it. The key includes the root `Cargo.toml`, since rust-cache hashes
-  only the members' manifests. Bump `cache-version` to start afresh.
+- a rust-cache dependency cache saved by the default branch by default. Pull requests only
+  restore caches; callers may opt manual branch runs into branch-scoped writes with
+  `cache-save-on-dispatch: true`. The restore prefix includes the canonical root `[profile]`
+  table; dependency, version and comment edits do not discard reusable dependency artifacts.
+  rust-cache still keys on lockfiles, member manifests, toolchain and build environment, and
+  Cargo validates restored fingerprints. Bump `cache-version` to start afresh.
 
 After the gate, the job fails if `Cargo.lock` changed. Legs run with `fail-fast: false`; each has
 `timeout-minutes` (default 60). Jobs only some apps need, such as fuzzing or web builds, stay in
