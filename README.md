@@ -559,3 +559,17 @@ The tests execute the FreeBSD run template under the host's POSIX shell with
 fixture build/test commands and real tar archives. They cover failures in each
 custom test group, default build/test failures, missing/corrupt packages and font
 environment propagation. They do not replace native FreeBSD caller runs.
+
+### Gate cache reuse
+
+The gate cache key includes the canonical root `[profile]` table, including per-package
+profile overrides. Dependency and version edits no longer change the restore prefix;
+`rust-cache` still keys on the lockfile, toolchain, environment and member manifests,
+and Cargo validates restored fingerprints. The first run after adopting this key
+is cold.
+
+Only the default branch saves by default. A caller may set
+`cache-save-on-dispatch: true` for repeated manual integration testing. This permits
+`workflow_dispatch` runs to save a cache scoped by GitHub to that branch, never a
+pull-request run. Use this selectively to avoid storage churn; sibling branches cannot
+restore each other's caches. Do not pass the input until this workflow change has landed.
