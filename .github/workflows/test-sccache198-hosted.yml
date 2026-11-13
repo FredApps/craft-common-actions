@@ -1,0 +1,21 @@
+name: Sccache 198 hosted correctness
+on:
+  push:
+    branches: [validation/sccache198-20261113]
+permissions:
+  contents: read
+jobs:
+  proof:
+    uses: storytold/craft-common-actions/.github/workflows/gate.yml@bc67c8a00c433822adb372cd994e16621f8f9ff6
+    with:
+      sccache: true
+      craft-fonts-ref: ''
+      require-craft-fonts: false
+      targets: ''
+      tools: ''
+      free-disk-space: false
+      cache-version: validation198-20261113
+      env: |
+        SCCACHE_GHA_RW_MODE=READ_WRITE
+      command: python scripts/sccache198-proof.py
+      timeout-minutes: 15
