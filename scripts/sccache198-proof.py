@@ -9,7 +9,7 @@ assert os.environ["SCCACHE_GHA_ENABLED"] == "true"
 assert os.environ["SCCACHE_GHA_VERSION"] == version(current), "actual gate hashFiles differs"
 print("Public cache namespace:", os.environ["SCCACHE_GHA_VERSION"], flush=True)
 pathlib.Path("target").mkdir(exist_ok=True)
-base = ["rustc", "--crate-name", "cfg_probe", "--crate-type", "lib", "--edition=2021", "--emit=link", "src/lib.rs", "-o", "target/probe.rlib", "-Dunexpected_cfgs"]
+base = ["rustc", "--crate-name", "cfg_probe", "--crate-type", "lib", "--edition=2021", "--emit=dep-info,metadata,link", "src/lib.rs", "--out-dir", "target", "-Dunexpected_cfgs"]
 known = tomllib.loads(current.decode())["lints"]["rust"]["unexpected_cfgs"]["check-cfg"]
 flags = sum((["--check-cfg", item] for item in known), []) or ["--check-cfg", "cfg()"]
 def run(cached, expected):
